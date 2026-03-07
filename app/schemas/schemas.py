@@ -183,21 +183,6 @@ class TransactionListResponse(BaseModel):
 # ================================================================== #
 
 
-class SpendingSummary(BaseModel):
-    category: str
-    total_spent: float
-    transaction_count: int
-    percentage: float = 0.0
-
-
-class SpendingResponse(BaseModel):
-    period: str
-    start: datetime
-    end: datetime
-    total: float
-    summaries: list[SpendingSummary]
-
-
 class InsightResponse(BaseModel):
     id: str
     type: str

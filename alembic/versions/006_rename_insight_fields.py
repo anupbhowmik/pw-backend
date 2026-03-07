@@ -1,14 +1,14 @@
 """Rename insight body→desc and data→details
 
 Revision ID: 006
-Revises: 005_google_oauth_user
+Revises: 005
 """
 
 from alembic import op
 import sqlalchemy as sa
 
 revision = "006"
-down_revision = "005_google_oauth_user"
+down_revision = "005"
 branch_labels = None
 depends_on = None
 

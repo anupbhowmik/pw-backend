@@ -7,6 +7,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.auth_routes import router as auth_router
+from app.api.document_routes import router as document_router
+from app.api.insight_routes import router as insight_router
 from app.api.middleware import RequestLoggingMiddleware
 
 # Inline logging setup (replaces core/logging.py)
@@ -38,6 +40,8 @@ app.add_middleware(RequestLoggingMiddleware)
 
 # Routers
 app.include_router(auth_router)
+app.include_router(document_router)
+app.include_router(insight_router)
 
 
 @app.get("/health")

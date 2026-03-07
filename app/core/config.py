@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     APP_ENV: str = "development"
     DATABASE_URL: str = "postgresql+asyncpg://receipts:receipts@db:5432/receipts"
     GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-2.5-flash-lite"
+    GEMINI_MODEL: str = "gemini-3.1-flash-lite-preview"
     MAX_UPLOAD_SIZE: int = 10 * 1024 * 1024  # 10 MB
     IMAGE_DIR: str = "./data/images"
     MAX_REPAIR_RETRIES: int = 2

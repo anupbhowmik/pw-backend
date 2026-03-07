@@ -6,3 +6,4 @@ data/images/*
 !data/images/.gitkeep
 *.egg-info/
 dist/
+.claude/

@@ -1,32 +1,33 @@
-"""Auth routes — Google OAuth, me."""
+"""Auth routes — Google OAuth, continue, me."""
 
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.security import (
     create_access_token,
+    decode_token,
     get_current_user,
+    validate_token,
     verify_google_token,
 )
 from app.models.models import User
 from app.schemas.schemas import (
     AuthContinueResponse,
     GoogleAuthRequest,
+    TokenResponse,
     UserResponse,
 )
 
 router = APIRouter(prefix="/v1/auth", tags=["auth"])
+_bearer = HTTPBearer()
 
 
-# ------------------------------------------------------------------ #
 # POST /v1/auth/google  — verify Google token, upsert user, return JWT
-# ------------------------------------------------------------------ #
-
-
 @router.post("/google", response_model=AuthContinueResponse)
 async def auth_google(body: GoogleAuthRequest, db: AsyncSession = Depends(get_db)):
     """Verify Google OAuth token, create or update user, return Halkhata JWT."""
@@ -78,12 +79,7 @@ async def auth_google(body: GoogleAuthRequest, db: AsyncSession = Depends(get_db
         access_token=token,
     )
 
-
-# ------------------------------------------------------------------ #
 # GET /v1/auth/user_profile  — current user profile
-# ------------------------------------------------------------------ #
-
-
 @router.get("/user/profile", response_model=UserResponse)
 async def me(user: User = Depends(get_current_user)):
     return UserResponse(
