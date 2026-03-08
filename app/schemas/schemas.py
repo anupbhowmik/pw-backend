@@ -247,6 +247,7 @@ class DashboardSummaryResponse(BaseModel):
     total_transactions: int
     total_spent: float
     average_transaction: float
+    last_receipt_total: float
     unread_insights: int
     unread_notifications: int
 
