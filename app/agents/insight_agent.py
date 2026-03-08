@@ -64,19 +64,35 @@ class InsightAgent:
             end = start.replace(month=start.month + 1)
         return start, end
 
-    async def _gather_spending_context(self) -> str:
-        """Build a spending summary string covering 3 months for the LLM."""
+    def _biweekly_bounds(self, month_start: datetime, month_end: datetime) -> list[tuple[str, datetime, datetime]]:
+        """Split a month into two biweekly periods: 1st-15th and 16th-end."""
+        mid = month_start.replace(day=16)
+        month_label = month_start.strftime("%B %Y")
+        return [
+            (f"{month_label} (1st–15th)", month_start, mid),
+            (f"{month_label} (16th–end)", mid, month_end),
+        ]
+
+    async def _gather_spending_context(self) -> tuple[str, str, str]:
+        """Build monthly and biweekly spending summaries for the LLM.
+
+        Returns (monthly_data, biweekly_data, spike_section).
+        """
         ref = await self._get_reference_date()
         current_start, current_end = self._month_bounds(ref)
         prev_start, prev_end = self._month_bounds(current_start - timedelta(days=1))
         two_ago_start, two_ago_end = self._month_bounds(prev_start - timedelta(days=1))
 
+        month_windows = [
+            (two_ago_start, two_ago_end),
+            (prev_start, prev_end),
+            (current_start, current_end),
+        ]
+
+        # --- Monthly summary ---
         months_data = []
-        for label, start, end in [
-            (two_ago_start.strftime("%B %Y"), two_ago_start, two_ago_end),
-            (prev_start.strftime("%B %Y"), prev_start, prev_end),
-            (current_start.strftime("%B %Y"), current_start, current_end),
-        ]:
+        for start, end in month_windows:
+            label = start.strftime("%B %Y")
             spending = await db_compute_spending(self.db, self.user_id, start, end)
             if not spending:
                 months_data.append(f"### {label}\nNo transactions.")
@@ -85,7 +101,19 @@ class InsightAgent:
             lines = [f"  - {s['category']}: ${s['total_spent']:.2f} ({s['percentage']}%) — {s['transaction_count']} transactions" for s in spending]
             months_data.append(f"### {label} (Total: ${total:.2f})\n" + "\n".join(lines))
 
-        # Spending spikes (current vs previous)
+        # --- Biweekly breakdown ---
+        biweekly_data = []
+        for start, end in month_windows:
+            for bw_label, bw_start, bw_end in self._biweekly_bounds(start, end):
+                spending = await db_compute_spending(self.db, self.user_id, bw_start, bw_end)
+                if not spending:
+                    biweekly_data.append(f"### {bw_label}\nNo transactions.")
+                    continue
+                total = sum(s["total_spent"] for s in spending)
+                lines = [f"  - {s['category']}: ${s['total_spent']:.2f} ({s['percentage']}%) — {s['transaction_count']} transactions" for s in spending]
+                biweekly_data.append(f"### {bw_label} (Total: ${total:.2f})\n" + "\n".join(lines))
+
+        # --- Spending spikes (current vs previous month) ---
         current_spending = await db_compute_spending(self.db, self.user_id, current_start, current_end)
         prev_spending = await db_compute_spending(self.db, self.user_id, prev_start, prev_end)
         prev_map = {s["category"]: s["total_spent"] for s in prev_spending}
@@ -99,18 +127,23 @@ class InsightAgent:
 
         spike_section = ""
         if spikes:
-            spike_section = "\n### Spending Spikes Detected\n" + "\n".join(spikes)
+            spike_section = "## Spending Spikes Detected\n" + "\n".join(spikes)
 
-        return "\n\n".join(months_data) + spike_section
+        return "\n\n".join(months_data), "\n\n".join(biweekly_data), spike_section
 
     async def generate(self, limit: int = 5) -> list[Insight]:
         """Gather spending data, send to LLM, parse response into Insights."""
-        spending_data = await self._gather_spending_context()
+        monthly_data, biweekly_data, spike_section = await self._gather_spending_context()
 
-        if spending_data.count("No transactions.") == 3:
-            return []
+        # If all 3 months are empty, let the LLM return the insufficient-data warning
+        all_empty = monthly_data.count("No transactions.") == 3
 
-        user_prompt = INSIGHT_USER_TEMPLATE.format(months=3, spending_data=spending_data)
+        user_prompt = INSIGHT_USER_TEMPLATE.format(
+            months=3,
+            monthly_data=monthly_data,
+            biweekly_data=biweekly_data,
+            spike_section=spike_section,
+        )
         logger.info("Insight LLM prompt:\n%s", user_prompt)
 
         raw = await call_text(INSIGHT_SYSTEM, user_prompt)
