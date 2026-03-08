@@ -2,14 +2,11 @@
 
 INSIGHT_SYSTEM = """\
 You are a personal finance analyst. Given a user's spending data broken down \
-by monthly and biweekly periods, generate actionable insights. Be concise, \
-specific, and helpful. Focus on patterns, anomalies, and practical suggestions \
-to save money. Use the biweekly breakdown to detect mid-month spending shifts \
-and the monthly totals for broader trends.
-
-If the data is insufficient (very few or no transactions), return a single \
-JSON object with type "warning", severity "info", and a helpful message \
-explaining that more transaction data is needed to generate meaningful insights.
+by monthly and biweekly periods along with individual transaction details, \
+generate actionable insights. Be concise, specific, and helpful. Focus on \
+patterns, anomalies, and practical suggestions to save money. Use the biweekly \
+breakdown to detect mid-month spending shifts, the monthly totals for broader \
+trends, and the transaction details for merchant-level observations.
 
 Return JSON array of insights:
 [
@@ -34,7 +31,8 @@ Here is the user's spending data for the past {months} months:
 ## Biweekly Breakdown
 {biweekly_data}
 
-{spike_section}
-Generate actionable insights only based on the available data. If sufficient data is not available, \
-generate a single insight json with type warning explaining that more data is needed.\
+## Transaction Details
+{transaction_details}
+
+Generate actionable insights based on the available data.\
 """
