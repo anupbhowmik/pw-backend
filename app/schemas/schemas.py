@@ -277,6 +277,44 @@ class DashboardRecentTransactionsResponse(BaseModel):
 
 
 # ================================================================== #
+# Data CRUD schemas
+# ================================================================== #
+
+
+class DataItemResponse(BaseModel):
+    id: str
+    merchant_name: str
+    purchase_date: Optional[datetime] = None
+    total: Optional[float] = None
+    currency: str
+    payment_method: Optional[str] = None
+    category_id: Optional[int] = None
+    category: Optional[str] = None
+    created_at: datetime
+
+
+class DataListResponse(BaseModel):
+    items: list[DataItemResponse]
+    count: int
+    limit: int
+    offset: int
+
+
+class DataItemUpdateRequest(BaseModel):
+    merchant_name: Optional[str] = None
+    purchase_date: Optional[datetime] = None
+    total: Optional[float] = None
+    currency: Optional[str] = None
+    payment_method: Optional[str] = None
+    category_id: Optional[int] = None
+
+
+class DataDeleteResponse(BaseModel):
+    deleted: bool
+    id: str
+
+
+# ================================================================== #
 # Generic
 # ================================================================== #
 
