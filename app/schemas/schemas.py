@@ -238,6 +238,44 @@ class ReminderRequest(BaseModel):
 
 
 # ================================================================== #
+# Dashboard schemas
+# ================================================================== #
+
+
+class DashboardSummaryResponse(BaseModel):
+    total_documents: int
+    total_transactions: int
+    total_spent: float
+    average_transaction: float
+    unread_insights: int
+    unread_notifications: int
+
+
+class DashboardCategorySpendItem(BaseModel):
+    category: str
+    amount: float
+    transaction_count: int
+
+
+class DashboardCategorySpendResponse(BaseModel):
+    categories: list[DashboardCategorySpendItem]
+    count: int
+
+
+class DashboardRecentTransactionItem(BaseModel):
+    id: str
+    merchant_name: str
+    total: float
+    purchase_date: Optional[datetime] = None
+    currency: str
+
+
+class DashboardRecentTransactionsResponse(BaseModel):
+    transactions: list[DashboardRecentTransactionItem]
+    count: int
+
+
+# ================================================================== #
 # Generic
 # ================================================================== #
 
