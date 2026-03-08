@@ -239,13 +239,41 @@ class DataListResponse(BaseModel):
     offset: int
 
 
-class DataItemUpdateRequest(BaseModel):
+class DataDetailResponse(BaseModel):
+    id: str
+    merchant_name: str
+    purchase_date: Optional[datetime] = None
+    subtotal: Optional[float] = None
+    tax: Optional[float] = None
+    total: Optional[float] = None
+    currency: str
+    payment_method: Optional[str] = None
+    category_id: Optional[int] = None
+    category: Optional[str] = None
+    items: list[TransactionItemResponse] = Field(default_factory=list)
+    created_at: datetime
+
+
+class TransactionItemUpdateRequest(BaseModel):
+    id: int
+    description_raw: Optional[str] = None
+    description_norm: Optional[str] = None
+    quantity: Optional[float] = None
+    unit_price: Optional[float] = None
+    total_price: Optional[float] = None
+    category_id: Optional[int] = None
+
+
+class DataDetailUpdateRequest(BaseModel):
     merchant_name: Optional[str] = None
     purchase_date: Optional[datetime] = None
+    subtotal: Optional[float] = None
+    tax: Optional[float] = None
     total: Optional[float] = None
     currency: Optional[str] = None
     payment_method: Optional[str] = None
     category_id: Optional[int] = None
+    items: Optional[list[TransactionItemUpdateRequest]] = None
 
 
 class DataDeleteResponse(BaseModel):
