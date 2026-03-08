@@ -20,6 +20,7 @@ from app.schemas.schemas import (
     AuthContinueResponse,
     GoogleAuthRequest,
     TokenResponse,
+    UserProfileUpdateRequest,
     UserResponse,
 )
 
@@ -90,4 +91,36 @@ async def me(user: User = Depends(get_current_user)):
         currency=user.currency,
         timezone=user.timezone,
         created_at=user.created_at,
+        monthly_income=user.monthly_income,
+        monthly_rent=user.monthly_rent,
+        monthly_gym_subscription=user.monthly_gym_subscription,
+        monthly_insurance=user.monthly_insurance,
+    )
+
+@router.put("/user/profile", response_model=UserResponse)
+async def update_profile(
+    body: UserProfileUpdateRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    # Only allow monthly budget fields to be updated via this endpoint.
+    updates = body.model_dump(exclude_unset=True)
+    for key, value in updates.items():
+        setattr(user, key, value)
+
+    await db.commit()
+    await db.refresh(user)
+
+    return UserResponse(
+        id=user.id,
+        email=user.email,
+        display_name=user.display_name,
+        picture=user.picture,
+        currency=user.currency,
+        timezone=user.timezone,
+        created_at=user.created_at,
+        monthly_income=user.monthly_income,
+        monthly_rent=user.monthly_rent,
+        monthly_gym_subscription=user.monthly_gym_subscription,
+        monthly_insurance=user.monthly_insurance,
     )

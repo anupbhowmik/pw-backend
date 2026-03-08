@@ -30,6 +30,17 @@ class UserResponse(BaseModel):
     currency: str
     timezone: str
     created_at: datetime
+    monthly_income: Optional[float] = None
+    monthly_rent: Optional[float] = None
+    monthly_gym_subscription: Optional[float] = None
+    monthly_insurance: Optional[float] = None
+
+
+class UserProfileUpdateRequest(BaseModel):
+    monthly_income: Optional[float] = None
+    monthly_rent: Optional[float] = None
+    monthly_gym_subscription: Optional[float] = None
+    monthly_insurance: Optional[float] = None
 
 
 class AuthContinueResponse(BaseModel):
