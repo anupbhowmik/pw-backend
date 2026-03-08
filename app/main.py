@@ -25,7 +25,7 @@ logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
 
 app = FastAPI(
-    title="Halkhata API",
+    title="Pennywise Backend API",
     description="Financial intelligence platform — document extraction, insights, planning",
     version="0.2.0",
 )
