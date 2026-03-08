@@ -247,6 +247,7 @@ class DashboardSummaryResponse(BaseModel):
     total_transactions: int
     total_spent: float
     average_transaction: float
+    last_receipt_total: float
     unread_insights: int
     unread_notifications: int
 
@@ -273,6 +274,44 @@ class DashboardRecentTransactionItem(BaseModel):
 class DashboardRecentTransactionsResponse(BaseModel):
     transactions: list[DashboardRecentTransactionItem]
     count: int
+
+
+# ================================================================== #
+# Data CRUD schemas
+# ================================================================== #
+
+
+class DataItemResponse(BaseModel):
+    id: str
+    merchant_name: str
+    purchase_date: Optional[datetime] = None
+    total: Optional[float] = None
+    currency: str
+    payment_method: Optional[str] = None
+    category_id: Optional[int] = None
+    category: Optional[str] = None
+    created_at: datetime
+
+
+class DataListResponse(BaseModel):
+    items: list[DataItemResponse]
+    count: int
+    limit: int
+    offset: int
+
+
+class DataItemUpdateRequest(BaseModel):
+    merchant_name: Optional[str] = None
+    purchase_date: Optional[datetime] = None
+    total: Optional[float] = None
+    currency: Optional[str] = None
+    payment_method: Optional[str] = None
+    category_id: Optional[int] = None
+
+
+class DataDeleteResponse(BaseModel):
+    deleted: bool
+    id: str
 
 
 # ================================================================== #

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,11 +27,17 @@ async def get_dashboard_summary(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+    last_month_cutoff = datetime.now(timezone.utc) - timedelta(days=30)
+
     docs_stmt = select(func.count(Document.id)).where(Document.user_id == user.id)
-    txns_stmt = select(
-        func.count(Transaction.id),
-        func.coalesce(func.sum(Transaction.total), 0.0),
-    ).where(Transaction.user_id == user.id)
+    txns_stmt = select(func.count(Transaction.id)).where(Transaction.user_id == user.id)
+    avg_txn_stmt = select(func.coalesce(func.avg(Transaction.total), 0.0)).where(
+        Transaction.user_id == user.id
+    )
+    total_spent_stmt = select(func.coalesce(func.sum(Transaction.total), 0.0)).where(
+        Transaction.user_id == user.id,
+        func.coalesce(Transaction.purchase_date, Transaction.created_at) >= last_month_cutoff,
+    )
     unread_insights_stmt = select(func.count(Insight.id)).where(
         Insight.user_id == user.id,
         Insight.is_read.is_(False),
@@ -38,23 +46,36 @@ async def get_dashboard_summary(
         Notification.user_id == user.id,
         Notification.is_read.is_(False),
     )
+    last_receipt_total_stmt = (
+        select(Transaction.total)
+        .where(Transaction.user_id == user.id)
+        .order_by(
+            Transaction.purchase_date.desc().nullslast(),
+            Transaction.created_at.desc(),
+        )
+        .limit(1)
+    )
 
     docs_result = await db.execute(docs_stmt)
     txns_result = await db.execute(txns_stmt)
+    avg_txn_result = await db.execute(avg_txn_stmt)
+    total_spent_result = await db.execute(total_spent_stmt)
     unread_insights_result = await db.execute(unread_insights_stmt)
     unread_notifications_result = await db.execute(unread_notifications_stmt)
+    last_receipt_total_result = await db.execute(last_receipt_total_stmt)
 
     total_documents = int(docs_result.scalar_one() or 0)
-    txn_count, txn_sum = txns_result.one()
-    total_transactions = int(txn_count or 0)
-    total_spent = float(txn_sum or 0.0)
-    average_transaction = total_spent / total_transactions if total_transactions else 0.0
+    total_transactions = int(txns_result.scalar_one() or 0)
+    total_spent = float(total_spent_result.scalar_one() or 0.0)
+    average_transaction = float(avg_txn_result.scalar_one() or 0.0)
+    last_receipt_total = float(last_receipt_total_result.scalar_one_or_none() or 0.0)
 
     return DashboardSummaryResponse(
         total_documents=total_documents,
         total_transactions=total_transactions,
         total_spent=round(total_spent, 2),
         average_transaction=round(average_transaction, 2),
+        last_receipt_total=round(last_receipt_total, 2),
         unread_insights=int(unread_insights_result.scalar_one() or 0),
         unread_notifications=int(unread_notifications_result.scalar_one() or 0),
     )
