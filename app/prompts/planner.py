@@ -22,6 +22,7 @@ Guidelines:
   user asks for detailed breakdowns.
 - When the user's budget info (income, rent, etc.) is provided, factor it \
   into if asked for plans.
+- Use text formatting only. No markdown or HTML.
 """
 
 PLANNER_USER_TEMPLATE = """\
