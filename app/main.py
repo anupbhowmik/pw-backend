@@ -12,6 +12,7 @@ from app.api.dashboard_routes import router as dashboard_router
 from app.api.document_routes import router as document_router
 from app.api.feed_routes import router as feed_router
 from app.api.insight_routes import router as insight_router
+from app.api.planner_routes import router as planner_router
 from app.api.middleware import RequestLoggingMiddleware
 
 # Inline logging setup (replaces core/logging.py)
@@ -48,6 +49,7 @@ app.include_router(feed_router)
 app.include_router(insight_router)
 app.include_router(dashboard_router)
 app.include_router(data_router)
+app.include_router(planner_router)
 
 
 @app.get("/health")

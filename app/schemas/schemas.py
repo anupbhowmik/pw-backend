@@ -278,6 +278,20 @@ class FeedListResponse(BaseModel):
     count: int
 
 
+# Planner schemas
+class PlannerMessage(BaseModel):
+    user: str = ""
+    airesponse: str = ""
+
+
+class PlannerChatRequest(BaseModel):
+    messages: list[PlannerMessage]
+
+
+class PlannerChatResponse(BaseModel):
+    response: str
+
+
 # Generic
 class ErrorResponse(BaseModel):
     detail: str
