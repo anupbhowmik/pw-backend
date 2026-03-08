@@ -10,6 +10,7 @@ from app.api.auth_routes import router as auth_router
 from app.api.data_routes import router as data_router
 from app.api.dashboard_routes import router as dashboard_router
 from app.api.document_routes import router as document_router
+from app.api.feed_routes import router as feed_router
 from app.api.insight_routes import router as insight_router
 from app.api.middleware import RequestLoggingMiddleware
 
@@ -43,6 +44,7 @@ app.add_middleware(RequestLoggingMiddleware)
 # Routers
 app.include_router(auth_router)
 app.include_router(document_router)
+app.include_router(feed_router)
 app.include_router(insight_router)
 app.include_router(dashboard_router)
 app.include_router(data_router)

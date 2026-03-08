@@ -315,6 +315,35 @@ class DataDeleteResponse(BaseModel):
 
 
 # ================================================================== #
+# Feed schemas
+# ================================================================== #
+
+
+class FeedItemResponse(BaseModel):
+    type: str  # price_comparison | transaction_summary | empty
+    title: str
+    desc: str
+    # price_comparison fields
+    product: Optional[str] = None
+    current_store: Optional[str] = None
+    current_price: Optional[float] = None
+    suggested_store: Optional[str] = None
+    suggested_price: Optional[float] = None
+    saving: Optional[float] = None
+    # transaction_summary fields
+    merchant: Optional[str] = None
+    total: Optional[float] = None
+    item_count: Optional[int] = None
+    top_items: list[str] = Field(default_factory=list)
+    purchase_date: Optional[str] = None
+
+
+class FeedListResponse(BaseModel):
+    feeds: list[FeedItemResponse]
+    count: int
+
+
+# ================================================================== #
 # Generic
 # ================================================================== #
 

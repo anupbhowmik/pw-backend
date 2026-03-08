@@ -88,3 +88,29 @@ async def call_text(
         raise LLMError(str(exc), status_code=exc.code) from exc
 
     return response.text or ""
+
+
+async def call_text_with_search(
+    system_prompt: str,
+    user_prompt: str,
+    model: str | None = None,
+) -> str:
+    """Text completion with Google Search grounding enabled."""
+    client = _get_client()
+
+    try:
+        response = await client.aio.models.generate_content(
+            model=model or settings.GEMINI_MODEL,
+            contents=[user_prompt],
+            config=types.GenerateContentConfig(
+                system_instruction=system_prompt,
+                tools=[types.Tool(google_search=types.GoogleSearch())],
+                temperature=0,
+                max_output_tokens=4096,
+            ),
+        )
+    except genai_errors.ClientError as exc:
+        logger.error("Gemini API error (search): %s", exc)
+        raise LLMError(str(exc), status_code=exc.code) from exc
+
+    return response.text or ""
