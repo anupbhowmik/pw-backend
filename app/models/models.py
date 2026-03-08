@@ -19,12 +19,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, new_id, utcnow
 
-
-# ------------------------------------------------------------------ #
-# Users
-# ------------------------------------------------------------------ #
-
-
 class User(Base):
     __tablename__ = "users"
 
@@ -42,11 +36,10 @@ class User(Base):
     insights: Mapped[list["Insight"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     notifications: Mapped[list["Notification"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
-
-# ------------------------------------------------------------------ #
-# Documents (replaces old receipts table)
-# ------------------------------------------------------------------ #
-
+    monthly_income: Mapped[float | None] = mapped_column(Float)
+    monthly_rent: Mapped[float | None] = mapped_column(Float)
+    monthly_gym_subscription: Mapped[float | None] = mapped_column(Float)
+    monthly_insurance: Mapped[float | None] = mapped_column(Float)
 
 class Document(Base):
     __tablename__ = "documents"
@@ -71,11 +64,6 @@ class Document(Base):
     transactions: Mapped[list["Transaction"]] = relationship(back_populates="document", cascade="all, delete-orphan")
 
 
-# ------------------------------------------------------------------ #
-# Categories (seeded with defaults)
-# ------------------------------------------------------------------ #
-
-
 class Category(Base):
     __tablename__ = "categories"
 
@@ -86,12 +74,6 @@ class Category(Base):
     is_system: Mapped[bool] = mapped_column(Boolean, default=True)
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
 
-
-# ------------------------------------------------------------------ #
-# Merchant Master
-# ------------------------------------------------------------------ #
-
-
 class MerchantMaster(Base):
     __tablename__ = "merchant_master"
 
@@ -99,11 +81,6 @@ class MerchantMaster(Base):
     canonical_name: Mapped[str] = mapped_column(String(256), unique=True, index=True)
     category_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("categories.id"))
     store_type: Mapped[str | None] = mapped_column(String(64))
-
-
-# ------------------------------------------------------------------ #
-# Transactions (replaces old receipt store/txn fields)
-# ------------------------------------------------------------------ #
 
 
 class Transaction(Base):
@@ -130,11 +107,6 @@ class Transaction(Base):
     items: Mapped[list["TransactionItem"]] = relationship(back_populates="transaction", cascade="all, delete-orphan")
 
 
-# ------------------------------------------------------------------ #
-# Transaction Items (replaces old line_items)
-# ------------------------------------------------------------------ #
-
-
 class TransactionItem(Base):
     __tablename__ = "transaction_items"
 
@@ -149,12 +121,6 @@ class TransactionItem(Base):
     category_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("categories.id"))
 
     transaction: Mapped["Transaction"] = relationship(back_populates="items")
-
-
-# ------------------------------------------------------------------ #
-# Derived User Metrics (materialized spending aggregates)
-# ------------------------------------------------------------------ #
-
 
 class DerivedUserMetric(Base):
     __tablename__ = "derived_user_metrics"
@@ -171,11 +137,6 @@ class DerivedUserMetric(Base):
     transaction_count: Mapped[int] = mapped_column(Integer, default=0)
 
 
-# ------------------------------------------------------------------ #
-# Insights
-# ------------------------------------------------------------------ #
-
-
 class Insight(Base):
     __tablename__ = "insights"
 
@@ -190,11 +151,6 @@ class Insight(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     user: Mapped["User"] = relationship(back_populates="insights")
-
-
-# ------------------------------------------------------------------ #
-# Notifications
-# ------------------------------------------------------------------ #
 
 
 class Notification(Base):
@@ -214,10 +170,6 @@ class Notification(Base):
 
     user: Mapped["User"] = relationship(back_populates="notifications")
 
-
-# ------------------------------------------------------------------ #
-# Planner Sessions (Phase 2 stub)
-# ------------------------------------------------------------------ #
 
 
 class PlannerSession(Base):
