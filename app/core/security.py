@@ -23,11 +23,7 @@ from app.models.models import User
 bearer_scheme = HTTPBearer()
 
 
-# ------------------------------------------------------------------ #
 # Google OAuth
-# ------------------------------------------------------------------ #
-
-
 def verify_google_token(token: str) -> dict:
     """Verify Google OAuth token and return user info.
 
@@ -79,11 +75,7 @@ def verify_google_token(token: str) -> dict:
         )
 
 
-# ------------------------------------------------------------------ #
 # JWT
-# ------------------------------------------------------------------ #
-
-
 def create_access_token(user_id: str) -> str:
     expire = datetime.now(timezone.utc) + timedelta(minutes=settings.JWT_EXPIRE_MINUTES)
     payload = {"sub": user_id, "exp": expire}
@@ -118,11 +110,7 @@ def decode_token(token: str) -> str:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 
-# ------------------------------------------------------------------ #
 # FastAPI dependency
-# ------------------------------------------------------------------ #
-
-
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     db: AsyncSession = Depends(get_db),

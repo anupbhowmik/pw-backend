@@ -22,11 +22,7 @@ from app.schemas.schemas import (
 router = APIRouter(prefix="/v1", tags=["insights"])
 
 
-# ------------------------------------------------------------------ #
 # GET /v1/insights
-# ------------------------------------------------------------------ #
-
-
 @router.get("/insights", response_model=InsightListResponse)
 async def get_insights(
     limit: int = Query(5, ge=1, le=50),
@@ -42,11 +38,7 @@ async def get_insights(
     )
 
 
-# ------------------------------------------------------------------ #
 # GET /v1/notifications
-# ------------------------------------------------------------------ #
-
-
 @router.get("/notifications", response_model=NotificationListResponse)
 async def list_notifications(
     limit: int = Query(20, le=100),
@@ -70,11 +62,7 @@ async def list_notifications(
     )
 
 
-# ------------------------------------------------------------------ #
 # POST /v1/notifications/reminder
-# ------------------------------------------------------------------ #
-
-
 @router.post("/notifications/reminder", response_model=NotificationResponse, status_code=201)
 async def create_reminder(
     body: ReminderRequest,
@@ -86,11 +74,7 @@ async def create_reminder(
     return _notif_to_response(notif)
 
 
-# ------------------------------------------------------------------ #
 # Helpers
-# ------------------------------------------------------------------ #
-
-
 def _insight_to_response(i: Insight) -> InsightResponse:
     return InsightResponse(
         id=i.id,

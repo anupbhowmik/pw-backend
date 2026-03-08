@@ -6,9 +6,7 @@ import re
 
 from app.schemas.schemas import ItemSchema, ReceiptSchema
 
-# ================================================================== #
 # Store name normalization + store-level category
-# ================================================================== #
 # Each entry: (regex_pattern, canonical_name, store_category)
 # Categories:
 #   groceries        – supermarkets, grocery chains
@@ -305,11 +303,7 @@ def normalize_item(item: ItemSchema) -> ItemSchema:
     )
 
 
-# ================================================================== #
 # Full receipt normalization
-# ================================================================== #
-
-
 def normalize_receipt(receipt: ReceiptSchema, model_name: str) -> ReceiptSchema:
     warnings: list[str] = list(receipt.metadata.warnings)
 

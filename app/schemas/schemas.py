@@ -8,11 +8,7 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, Field
 
 
-# ================================================================== #
 # Auth
-# ================================================================== #
-
-
 class GoogleAuthRequest(BaseModel):
     token: str  # Google OAuth ID token from frontend
 
@@ -49,11 +45,7 @@ class AuthContinueResponse(BaseModel):
     token_type: str = "bearer"
 
 
-# ================================================================== #
 # LLM Extraction (kept from original — used by document pipeline)
-# ================================================================== #
-
-
 class StoreSchema(BaseModel):
     name: str
     store_number: Optional[str] = None
@@ -101,11 +93,7 @@ class ReceiptSchema(BaseModel):
     metadata: ExtractionMetadata = Field(default_factory=ExtractionMetadata)
 
 
-# ================================================================== #
 # Extract / Process (two-step pipeline)
-# ================================================================== #
-
-
 class ExtractResponse(BaseModel):
     """Response from POST /v1/documents/ocr_extract — OCR-only step."""
     document_id: str
@@ -130,11 +118,7 @@ class ProcessResponse(BaseModel):
     warnings: list[str] = Field(default_factory=list)
 
 
-# ================================================================== #
 # Document API responses
-# ================================================================== #
-
-
 class DocumentResponse(BaseModel):
     id: str
     user_id: str
@@ -151,11 +135,7 @@ class DocumentListResponse(BaseModel):
     count: int
 
 
-# ================================================================== #
 # Transaction API responses
-# ================================================================== #
-
-
 class TransactionItemResponse(BaseModel):
     id: int
     line_number: Optional[int] = None
@@ -189,11 +169,7 @@ class TransactionListResponse(BaseModel):
     count: int
 
 
-# ================================================================== #
 # Insight schemas
-# ================================================================== #
-
-
 class InsightResponse(BaseModel):
     id: str
     type: str
@@ -209,39 +185,7 @@ class InsightListResponse(BaseModel):
     insights: list[InsightResponse]
     count: int
 
-
-# ================================================================== #
-# Notification schemas
-# ================================================================== #
-
-
-class NotificationResponse(BaseModel):
-    id: str
-    type: str
-    title: str
-    body: str
-    channel: str
-    is_read: bool
-    scheduled_at: Optional[datetime] = None
-    created_at: datetime
-
-
-class NotificationListResponse(BaseModel):
-    notifications: list[NotificationResponse]
-    count: int
-
-
-class ReminderRequest(BaseModel):
-    title: str
-    body: str = ""
-    scheduled_at: datetime
-
-
-# ================================================================== #
 # Dashboard schemas
-# ================================================================== #
-
-
 class DashboardSummaryResponse(BaseModel):
     total_documents: int
     total_transactions: int
@@ -276,11 +220,7 @@ class DashboardRecentTransactionsResponse(BaseModel):
     count: int
 
 
-# ================================================================== #
 # Data CRUD schemas
-# ================================================================== #
-
-
 class DataItemResponse(BaseModel):
     id: str
     merchant_name: str
@@ -314,11 +254,7 @@ class DataDeleteResponse(BaseModel):
     id: str
 
 
-# ================================================================== #
 # Feed schemas
-# ================================================================== #
-
-
 class FeedItemResponse(BaseModel):
     type: str  # price_comparison | transaction_summary | empty
     title: str
@@ -343,11 +279,7 @@ class FeedListResponse(BaseModel):
     count: int
 
 
-# ================================================================== #
 # Generic
-# ================================================================== #
-
-
 class ErrorResponse(BaseModel):
     detail: str
     errors: list[dict] | None = None
