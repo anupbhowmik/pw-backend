@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.security import get_current_user
-from app.models.models import Category, Document, Insight, Notification, Transaction, User
+from app.models.models import Category, Document, Insight, Transaction, User
 from app.schemas.schemas import (
     DashboardCategorySpendItem,
     DashboardCategorySpendResponse,
@@ -42,10 +42,6 @@ async def get_dashboard_summary(
         Insight.user_id == user.id,
         Insight.is_read.is_(False),
     )
-    unread_notifications_stmt = select(func.count(Notification.id)).where(
-        Notification.user_id == user.id,
-        Notification.is_read.is_(False),
-    )
     last_receipt_total_stmt = (
         select(Transaction.total)
         .where(Transaction.user_id == user.id)
@@ -61,7 +57,6 @@ async def get_dashboard_summary(
     avg_txn_result = await db.execute(avg_txn_stmt)
     total_spent_result = await db.execute(total_spent_stmt)
     unread_insights_result = await db.execute(unread_insights_stmt)
-    unread_notifications_result = await db.execute(unread_notifications_stmt)
     last_receipt_total_result = await db.execute(last_receipt_total_stmt)
 
     total_documents = int(docs_result.scalar_one() or 0)
@@ -77,7 +72,6 @@ async def get_dashboard_summary(
         average_transaction=round(average_transaction, 2),
         last_receipt_total=round(last_receipt_total, 2),
         unread_insights=int(unread_insights_result.scalar_one() or 0),
-        unread_notifications=int(unread_notifications_result.scalar_one() or 0),
     )
 
 

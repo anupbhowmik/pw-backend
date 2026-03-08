@@ -193,7 +193,6 @@ class DashboardSummaryResponse(BaseModel):
     average_transaction: float
     last_receipt_total: float
     unread_insights: int
-    unread_notifications: int
 
 
 class DashboardCategorySpendItem(BaseModel):

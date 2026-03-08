@@ -161,22 +161,6 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
     )
 
-    # Notifications
-    op.create_table(
-        "notifications",
-        sa.Column("id", sa.String(32), primary_key=True),
-        sa.Column("user_id", sa.String(32), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True),
-        sa.Column("type", sa.String(64), nullable=False),
-        sa.Column("title", sa.String(256), nullable=False),
-        sa.Column("body", sa.Text, nullable=False),
-        sa.Column("channel", sa.String(20), server_default="in_app"),
-        sa.Column("is_read", sa.Boolean, server_default=sa.text("false")),
-        sa.Column("scheduled_at", sa.DateTime(timezone=True)),
-        sa.Column("related_id", sa.String(32)),
-        sa.Column("related_type", sa.String(64)),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
-    )
-
     # Planner Sessions
     op.create_table(
         "planner_sessions",
@@ -195,7 +179,6 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_table("planner_sessions")
-    op.drop_table("notifications")
     op.drop_table("insights")
     op.drop_table("derived_user_metrics")
     op.drop_table("transaction_items")

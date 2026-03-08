@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.models import Category, Insight, Notification, Transaction
+from app.models.models import Category, Insight, Transaction
 from app.prompts.insight import INSIGHT_SYSTEM, INSIGHT_USER_TEMPLATE
 from app.services.llm import call_text
 from app.tools.tools import db_compute_spending
@@ -294,16 +294,6 @@ class InsightAgent:
             )
             self.db.add(insight)
             insights.append(insight)
-
-            notif = Notification(
-                user_id=self.user_id,
-                type="insight",
-                title=insight.title,
-                body=insight.desc,
-                related_id=insight.id,
-                related_type="insight",
-            )
-            self.db.add(notif)
 
         if insights:
             await self.db.commit()
